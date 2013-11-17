@@ -1,5 +1,5 @@
 /*
-known.c - Unit tests for functions with known test vectors
+test.c - Test harness
 Written in 2013 by Daniel Franke <dfoxfranke@gmail.com>
 
 To the extent possible under law, the author(s) have dedicated all
