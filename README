@@ -1,0 +1,6 @@
+This is an implementation of EARWORM, a prospective candidate in the
+Password Hashing Competition (https://password-hashing.net). For background,
+see http://comments.gmane.org/gmane.comp.security.phc/226.
+
+DO NOT UNDER ANY CIRCUMSTANCES GIVE EVEN THE SLIGHTEST CONSIDERATION
+TO USING THIS CODE IN PRODUCTION.
