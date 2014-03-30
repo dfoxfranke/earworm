@@ -409,24 +409,24 @@ static int run_phs(uint8_t *out, size_t outlen,
   if(in_printable)
     printf("\"%s\", ", in);
   else { 
-    for(i=0; i<inlen && i<16; i++)
+    for(i=0; i<inlen && i<8; i++)
       printf("%.2hhx", in[i]);
-    if(inlen > 16)
-      printf("...");
+    if(inlen > 8)
+      printf("...%.2hhx", in[inlen-1]);
     printf(", ");
   }
 
   if(salt_printable)
     printf("\"%s\", ", salt);
   else { 
-    for(i=0; i<saltlen && i<16; i++)
+    for(i=0; i<saltlen && i<8; i++)
       printf("%.2hhx", salt[i]);
-    if(saltlen > 16)
-      printf("...");
+    if(saltlen > 8)
+      printf("...%.2hhx", salt[saltlen-1]);
     printf(", ");
   }
 
-  printf("%d, %d) = ", t_cost, m_cost);
+  printf("%d, %d, %u) = ", t_cost, m_cost, (unsigned int)outlen);
   fflush(stdout);
 
   gettimeofday(&start, NULL);
@@ -469,11 +469,12 @@ static int run_test(char *name, int (*test)()) {
 #define check(test) run_test(#test, test)
 
 int main() {
-  uint8_t out[16];
+  uint8_t out[64];
   pthread_t thread[16];
   uint32_t thread_no[16] = { 0, 1, 2, 3 ,4, 5, 6, 7, 8,
                              9, 10, 11, 12, 13, 14, 15 };
   int i;
+  uint8_t rainbow[256];
 
   printf("Verifying known test vectors...\n");
   if(check(test_be32enc) |
@@ -494,10 +495,32 @@ int main() {
   PHS_initialize_arena(16);
   printf("done\n");
 
-  run_phs(out, sizeof out,
+  run_phs(out, 16,
+          (const uint8_t*)"secret", 6,
+          (const uint8_t*)"salt", 4,
+          1, 12);
+
+  run_phs(out, 16,
           (const uint8_t*)"secret", 6,
           (const uint8_t*)"salt", 4,
           10000, 16);
+
+  run_phs(out, 64,
+          (const uint8_t*)"secret", 6,
+          (const uint8_t*)"salt", 4,
+          10000, 16);
+
+  run_phs(out, 16,
+          (const uint8_t*)"", 0,
+          (const uint8_t*)"", 0,
+          10000, 16);
+
+  for(i=0; i<256; i++) rainbow[i] = i;
+  run_phs(out, 16,
+          rainbow, 256,
+          rainbow, 32,
+          10000, 16);
+  
 
   printf("Running 16 threads...\n");
 
